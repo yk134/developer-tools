@@ -54,18 +54,18 @@ replacements = {
     'Odoo': 'Flectra',
     'ODOO': 'FLECTRA',
     '8069': '7073',
-    'Part of Odoo.': 'Part of Flectra.',
+    'Part of Odoo.': 'Part of Odoo, Flectra.',
 }
 
 xml_replacements = {
     'odoo': 'flectra',
     'Odoo': 'Flectra',
     'ODOO': 'FLECTRA',
-    'Part of Odoo.': 'Part of Flectra.',
+    'Part of Odoo.': 'Part of Odoo, Flectra.',
 }
 
 init_replacements = {
-    'Odoo.': 'Odoo,Flectra.',
+    'Odoo.': 'Odoo, Flectra.',
     'odoo': 'flectra',
 }
 
