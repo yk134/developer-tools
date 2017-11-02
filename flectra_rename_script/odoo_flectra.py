@@ -5,7 +5,7 @@ import os
 import time
 import sys
 import logging
-import shutil
+from shutil import copytree
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -20,9 +20,9 @@ Run command  : python odoo_flectra.py <path> [--copy/-c] [--help/-h]
 @param -> <path>         : give a path where your module is located
 @param -> --copy OR -C   : this is an option parameter, pass if you want to make a copy before converting
 
-@example> For Help       : python odoo_flectra.py /home/erp/odoo -h
-@example> Without Copy   : python odoo_flectra.py /home/erp/odoo
-@example> With Copy      : python odoo_flectra.py /home/erp/odoo --copy
+@example> For Help       : python odoo_flectra.py [-h]
+@example> Without Copy   : python odoo_flectra.py /home/<system_user>/<module_name>
+@example> With Copy      : python odoo_flectra.py /home/<system_user>/<module_name> --copy
 #######################################################################################################'''
 
 if '--help' in sys.argv or '-H' in sys.argv or '-h' in sys.argv:
@@ -37,6 +37,7 @@ else:
     odoo_path = sys.argv[1]
     if not os.path.isdir(odoo_path) and not os.path.exists(odoo_path):
         logging.error('Directory does not exist. Please check for path : %s' % odoo_path)
+        print(_help)
         os._exit(1)
 
 suffix = "/";
@@ -46,7 +47,6 @@ while odoo_path.endswith(suffix,len(odoo_path)-1) :
 logging.info("You Directory is : %s" % odoo_path)
 if '--copy' in sys.argv or '-C' in sys.argv or '-c' in sys.argv:
     logging.info('Please wait, copy is being process.')
-    from shutil import copytree
     copytree(odoo_path, odoo_path+ time.strftime("%Y-%m-%d %H:%M:%S"))
 
 replacements = {
@@ -156,7 +156,7 @@ def rename_files(root, items):
                     for word in lines:
                         word = word if word.endswith('\n') else word + ' ' if word else ' '
                         temp_file.write(word)
-                shutil.move('temp', root + name)
+                os.rename('temp', root + name)
         else:
             sp_name = name.split('.')
             if len(sp_name) >= 2 and sp_name[-1] in ['xml', 'csv', 'json']:
@@ -168,7 +168,7 @@ def rename_files(root, items):
                     infile = infile.replace(i, xml_replacements[i])
                 out.write(infile)
                 out.close()
-            elif sp_name[-1] != 'po':
+            elif sp_name[-1] not in ['po', 'pot']:
                 infile = open(root + name).read()
                 out = open(root + name, 'w')
                 for i in replace_email.keys():
@@ -194,12 +194,12 @@ def rename_files(root, items):
                         for word in lines:
                             word = word if word.endswith('\n') else word + ' ' if word else ' '
                             temp_file.write(word)
-                    shutil.move('temp', root + name)
+                    os.rename('temp', root + name)
         try:
             for i in replacements.keys():
                 if name != (name.replace(i, replacements[i])) :
-                    logging.info('git mv ' + name + ' ' + (name.replace(i, replacements[i])))
-                    os.system('cd ' + root + ' && git mv ' + name + ' ' + (name.replace(i, replacements[i])))
+                    logging.info('Rename With :: ' + name + ' -> ' + (name.replace(i, replacements[i])))
+                    os.rename(root + name, root + (name.replace(i, replacements[i])))
         except OSError as e:
             pass
 
@@ -220,8 +220,6 @@ if os.path.isdir(odoo_path):
         dirs[:] = [d for d in dirs if not d[0] == '.']
         rename_files(root + '/', files)
         rename_dir(root + '/', dirs)
-    if os.path.exists(odoo_path + '/odoo') and os.path.isdir(odoo_path + '/odoo'):
-        os.system('cd ' + odoo_path + ' && git mv odoo flectra')
 else:
     rename_files('',[odoo_path])
 end_time = time.strftime("%Y-%m-%d %H:%M:%S")
