@@ -115,23 +115,8 @@ def rename_files(root, items):
             out.close
         elif name == '__manifest__.py':
             infile = open(root + name).read()
-            author = eval(infile)
             temp.update(replace_email)
             temp.update(website_replacements)
-            if author and author.get('author', False):
-                author_name = ''
-                key_author = str(author['author'])
-                if isinstance(author['author'], list):
-                    if ' Flectra' not in author['author']:
-                        author['author'].append('Flectra')
-                else:
-                    split_name = author['author'].split(',')
-                    if ' Flectra' not in split_name:
-                        author_name = author['author'] + ', Flectra'
-                if author_name:
-                    temp.update({key_author: author_name})
-                else:
-                    temp.update({key_author: str(author['author'])})
             out = open(root + name, 'w')
             for i in temp.keys():
                 infile = infile.replace(i, temp[i])
@@ -168,7 +153,7 @@ def rename_files(root, items):
                     infile = infile.replace(i, xml_replacements[i])
                 out.write(infile)
                 out.close()
-            elif sp_name[-1] not in ['po', 'pot']:
+            elif sp_name[-1] not in ['po', 'pot', 'pyc']:
                 infile = open(root + name).read()
                 out = open(root + name, 'w')
                 for i in replace_email.keys():
@@ -212,6 +197,8 @@ def rename_dir(root, items):
                 rename_files(in_root + '/', files)
             if dirs:
                 rename_dir(in_root + '/', dirs)
+        if 'odoo' in folder:
+            os.rename(root + folder, root + folder.replace('odoo','flectra'))
 
 start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 if os.path.isdir(odoo_path):
