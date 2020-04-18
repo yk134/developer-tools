@@ -1,0 +1,28 @@
+1) To login in with postgres user :
+Command : sudo su postgres
+
+2) Open psql for specific version
+-> First check for default version
+Command : psql -V
+O/P     :
+psql (PostgreSQL) 10.12 (Ubuntu 10.12-0ubuntu0.18.04.1)
+
+-> First check port for the version
+Command : pg_lsclusters
+O/P     :
+Ver Cluster Port Status Owner    Data directory              Log file
+10  main    5432 online postgres /var/lib/postgresql/10/main /var/log/postgresql/postgresql-10-main.log
+11  main    5433 online postgres /var/lib/postgresql/11/main /var/log/postgresql/postgresql-11-main.log
+
+-> Open psql with port
+Command : psql [-p <#port>]
+Example : psql -p 5433 DB_NAME
+
+3) createdb and dropdb
+Command :
+    -> createdb -p 5433 DB_NAME
+    -> dropdb -p 5433 DB_NAME
+
+4) to run odoo with specific specific port
+Command : 
+    -> ./odoo-bin --db_port=5433
